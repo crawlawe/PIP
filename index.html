@@ -33,10 +33,12 @@
         overflow-y: auto;
         min-height: 100vh;
         padding-bottom: 200px;
+        -webkit-font-smoothing: none;
       }
       
-      ::-webkit-scrollbar { width: 12px; background: #000; }
+      ::-webkit-scrollbar { width: 12px; height: 12px; background: #000; }
       ::-webkit-scrollbar-thumb { background: #11d13b; border: 2px solid #000; }
+      ::-webkit-scrollbar-track { background: #001100; }
       ::selection { background: #11d13b; color: #000000; }
 
       /* CRT Effects */
@@ -77,6 +79,15 @@
         -webkit-appearance: none; margin: 0; 
       }
       input[type=number] { -moz-appearance: textfield; }
+
+      /* Mobile utilities */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
     </style>
 </head>
 <body>
@@ -117,7 +128,7 @@
           osc.type = 'sine';
           osc.frequency.setValueAtTime(800, this.ctx.currentTime);
           osc.frequency.exponentialRampToValueAtTime(1200, this.ctx.currentTime + 0.05);
-          gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+          gain.gain.setValueAtTime(0.05, this.ctx.currentTime); // Lower volume for hover
           gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
           osc.connect(gain);
           gain.connect(this.masterGain);
@@ -176,7 +187,7 @@
 
       const TabNavigation = ({ activeTab, setActiveTab }) => {
         return (
-          <nav className="sticky top-0 z-50 bg-black border-b-2 border-[#11d13b] pb-2 pt-4 px-2 flex justify-between md:justify-start gap-2 overflow-x-auto">
+          <nav className="sticky top-0 z-50 bg-black border-b-4 border-[#11d13b] pt-2 pb-1 px-2 flex justify-between md:justify-start gap-2 overflow-x-auto no-scrollbar touch-pan-x">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
@@ -184,12 +195,12 @@
                   audioService.playClick();
                   setActiveTab(tab.id);
                 }}
-                onMouseEnter={() => audioService.playHover()}
                 className={`
-                  flex-1 md:flex-none px-4 py-2 text-xl font-bold uppercase tracking-widest transition-all duration-200
+                  flex-shrink-0 px-4 py-3 text-lg md:text-xl font-bold uppercase tracking-widest transition-all duration-200
+                  border-t-2 border-x-2 border-transparent rounded-t-lg
                   ${activeTab === tab.id 
-                    ? 'bg-[#11d13b] text-black shadow-[0_0_15px_#11d13b]' 
-                    : 'bg-black text-[#11d13b] border border-[#11d13b] hover:bg-[#11d13b] hover:text-black hover:bg-opacity-20'}
+                    ? 'bg-[#11d13b] text-black border-[#11d13b] shadow-[0_-5px_15px_rgba(17,209,59,0.3)]' 
+                    : 'text-[#11d13b] hover:bg-[#11d13b] hover:text-black hover:bg-opacity-20'}
                 `}
               >
                 {tab.label}
@@ -231,8 +242,8 @@
         };
 
         return (
-          <div className="space-y-8 p-4">
-            <div className="border-2 border-[#11d13b] p-4 bg-black shadow-[0_0_10px_rgba(17,209,59,0.3)]">
+          <div className="space-y-8 p-4 md:p-6 pb-20">
+            <div className="border-2 border-[#11d13b] p-4 bg-black shadow-[0_0_10px_rgba(17,209,59,0.2)]">
               <h2 className="text-2xl mb-4 border-b border-[#11d13b] pb-2 text-glow">NEW ROUTINE PROTOCOL</h2>
               
               <div className="space-y-4">
@@ -242,7 +253,7 @@
                     type="text" 
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="bg-black border border-[#11d13b] p-2 text-xl focus:outline-none focus:ring-2 focus:ring-[#11d13b]"
+                    className="bg-black border border-[#11d13b] p-3 text-xl focus:outline-none focus:ring-2 focus:ring-[#11d13b]"
                     placeholder="ENTER DESIGNATION..."
                   />
                 </div>
@@ -255,7 +266,7 @@
                       value={duration}
                       onChange={(e) => setDuration(e.target.value)}
                       min="1"
-                      className="bg-black border border-[#11d13b] p-2 text-lg focus:outline-none placeholder-[#11d13b] placeholder-opacity-50"
+                      className="bg-black border border-[#11d13b] p-3 text-lg focus:outline-none placeholder-[#11d13b] placeholder-opacity-50"
                       placeholder="ENTER MINUTES..."
                     />
                   </div>
@@ -266,7 +277,7 @@
                       <select 
                         value={categorySelection} 
                         onChange={(e) => setCategorySelection(e.target.value)}
-                        className="bg-black border border-[#11d13b] p-2 text-lg focus:outline-none flex-1"
+                        className="bg-black border border-[#11d13b] p-3 text-lg focus:outline-none flex-1 appearance-none"
                       >
                         {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                       </select>
@@ -276,7 +287,7 @@
                           value={customCategory}
                           onChange={(e) => setCustomCategory(e.target.value)}
                           placeholder="TYPE..."
-                          className="bg-black border border-[#11d13b] p-2 w-1/2 focus:outline-none animate-pulse"
+                          className="bg-black border border-[#11d13b] p-3 w-1/2 focus:outline-none animate-pulse"
                         />
                       )}
                     </div>
@@ -286,7 +297,7 @@
                 <button 
                   onClick={handleAdd}
                   onMouseEnter={() => audioService.playHover()}
-                  className="w-full bg-[#11d13b] text-black font-bold py-3 text-xl hover:bg-opacity-90 active:scale-95 transition-transform"
+                  className="w-full bg-[#11d13b] text-black font-bold py-4 text-xl hover:bg-opacity-90 active:scale-95 transition-transform shadow-[0_0_10px_#11d13b]"
                 >
                   [ INITIATE PROTOCOL ]
                 </button>
@@ -299,12 +310,12 @@
               
               <div className="grid gap-4">
                 {quests.map(quest => (
-                  <div key={quest.id} className="flex justify-between items-center border border-[#11d13b] p-3 hover:bg-[#11d13b] hover:bg-opacity-10 transition-colors">
+                  <div key={quest.id} className="flex justify-between items-center border border-[#11d13b] p-4 bg-[#001100] hover:bg-[#11d13b] hover:bg-opacity-10 transition-colors">
                     <div>
                       <div className="font-bold text-lg">{quest.name}</div>
-                      <div className="text-xs opacity-70 flex gap-2">
-                        <span>[{quest.category}]</span>
-                        <span>TIME: {quest.duration}m</span>
+                      <div className="text-sm opacity-70 flex gap-2 mt-1">
+                        <span className="bg-[#11d13b] text-black px-1 text-xs">{quest.category}</span>
+                        <span>{quest.duration}m</span>
                       </div>
                     </div>
                     <button 
@@ -312,10 +323,10 @@
                         audioService.playClick();
                         deleteQuest(quest.id);
                       }}
-                      className="text-[#11d13b] hover:text-red-500 p-2 border border-transparent hover:border-red-500 transition-all"
-                      title="TERMINATE"
+                      className="text-[#11d13b] hover:bg-red-900 hover:text-red-500 p-3 border border-[#11d13b] hover:border-red-500 transition-all active:scale-90"
+                      aria-label="Delete Protocol"
                     >
-                      [TRASH]
+                      DELETE
                     </button>
                   </div>
                 ))}
@@ -325,7 +336,7 @@
         );
       };
 
-      // 3. Tracker Tab
+      // 3. Tracker Tab (Responsive: Cards for Mobile, Table for Desktop)
       const TrackerTab = ({ quests, toggleHistory }) => {
         const weekDates = useMemo(() => {
           const dates = [];
@@ -346,73 +357,147 @@
         const getDayStatus = (date) => {
           const dateStr = date.toISOString().split('T')[0];
           const isToday = dateStr === todayStr;
-          const isPast = date < new Date(new Date().setHours(0,0,0,0));
-          const isFuture = date > new Date(new Date().setHours(23,59,59,999));
-          return { dateStr, isToday, isPast, isFuture };
+          return { dateStr, isToday, dayInitial: date.toLocaleDateString('en-US', { weekday: 'narrow' }) };
         };
 
         return (
-          <div className="p-2 md:p-4 overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[600px]">
-              <thead>
-                <tr>
-                  <th className="p-2 border-b-2 border-[#11d13b] w-1/3">ROUTINE</th>
-                  {weekDates.map(date => {
-                    const { dateStr, isToday } = getDayStatus(date);
-                    const dayName = date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
-                    const dayNum = date.getDate();
-                    return (
-                      <th key={dateStr} className={`
-                        p-2 text-center border-b-2 border-[#11d13b]
-                        ${isToday ? 'border-t-2 bg-[#11d13b] bg-opacity-20 animate-pulse' : ''}
-                      `}>
-                        <div className="text-lg md:text-xl font-bold">{dayName} {dayNum}</div>
-                      </th>
-                    );
-                  })}
-                </tr>
-              </thead>
-              <tbody>
-                {quests.map(quest => (
-                  <tr key={quest.id} className="border-b border-[#11d13b] border-opacity-30 hover:bg-[#11d13b] hover:bg-opacity-5">
-                    <td className="p-3 font-bold truncate max-w-[150px]">
-                      {quest.name}
-                      <div className="text-[10px] opacity-60">{quest.duration} MINS</div>
-                    </td>
-                    {weekDates.map(date => {
-                      const { dateStr, isToday } = getDayStatus(date);
-                      const isCompleted = !!quest.history[dateStr];
-                      return (
-                        <td key={dateStr} className="p-2 text-center">
-                          <div className="flex justify-center">
-                            <input 
+          <div className="p-2 md:p-4 pb-20">
+            
+            {/* --- MOBILE VIEW: Cards --- */}
+            <div className="md:hidden space-y-4">
+              {quests.map(quest => {
+                const todayStatus = getDayStatus(new Date());
+                const isTodayDone = !!quest.history[todayStatus.dateStr];
+                
+                return (
+                  <div key={quest.id} className="border border-[#11d13b] p-4 bg-black relative shadow-[0_0_8px_rgba(17,209,59,0.15)]">
+                    
+                    {/* Header */}
+                    <div className="flex justify-between items-start mb-4">
+                       <div>
+                          <div className="text-2xl font-bold leading-none mb-1 text-glow">{quest.name}</div>
+                          <div className="flex gap-2 text-xs">
+                             <span className="bg-[#11d13b] text-black px-1">{quest.category}</span>
+                             <span className="opacity-70">{quest.duration} MIN</span>
+                          </div>
+                       </div>
+                       
+                       {/* Today's Checkbox (Large) */}
+                       <div className="flex flex-col items-center gap-1">
+                          <label className="text-[10px] opacity-70">TODAY</label>
+                          <input 
                               type="checkbox"
-                              checked={isCompleted}
-                              disabled={!isToday}
+                              checked={isTodayDone}
                               onChange={() => {
                                 audioService.playClick();
-                                if (!isCompleted) audioService.playSuccess();
-                                toggleHistory(quest.id, dateStr);
+                                if (!isTodayDone) audioService.playSuccess();
+                                toggleHistory(quest.id, todayStatus.dateStr);
                               }}
-                              className={`
-                                appearance-none border-2 border-[#11d13b] w-6 h-6 md:w-8 md:h-8
-                                ${isCompleted ? 'bg-[#11d13b] shadow-[0_0_8px_#11d13b]' : 'bg-transparent'}
-                                ${!isToday ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:scale-110 transition-transform'}
-                              `}
-                            />
-                          </div>
-                        </td>
+                              className="appearance-none border-2 border-[#11d13b] w-12 h-12 bg-black checked:bg-[#11d13b] checked:shadow-[0_0_15px_#11d13b] transition-all cursor-pointer"
+                          />
+                       </div>
+                    </div>
+
+                    {/* Weekly Visualization Strip */}
+                    <div className="border-t border-[#11d13b] border-opacity-30 pt-3">
+                       <div className="flex justify-between px-1">
+                         {weekDates.map(date => {
+                           const { dateStr, isToday, dayInitial } = getDayStatus(date);
+                           const isDone = !!quest.history[dateStr];
+                           
+                           return (
+                             <div key={dateStr} className="flex flex-col items-center gap-1">
+                                <div className={`w-6 h-6 border border-[#11d13b] flex items-center justify-center transition-colors
+                                  ${isDone ? 'bg-[#11d13b]' : 'bg-transparent'}
+                                  ${isToday ? 'border-2 animate-pulse shadow-[0_0_5px_#11d13b]' : 'opacity-60'}
+                                `}>
+                                   {isDone && <span className="text-black text-xs font-bold">✓</span>}
+                                </div>
+                                <span className={`text-[10px] ${isToday ? 'text-[#11d13b] font-bold' : 'opacity-50'}`}>
+                                  {dayInitial}
+                                </span>
+                             </div>
+                           )
+                         })}
+                       </div>
+                    </div>
+                    
+                  </div>
+                );
+              })}
+              {quests.length === 0 && (
+                <div className="text-center p-8 border border-[#11d13b] border-dashed opacity-50">
+                  NO ROUTINES. ADD IN ADMIN.
+                </div>
+              )}
+            </div>
+
+            {/* --- DESKTOP VIEW: Table --- */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[600px]">
+                <thead>
+                  <tr>
+                    <th className="p-3 border-b-2 border-[#11d13b] w-1/3 text-xl">ROUTINE</th>
+                    {weekDates.map(date => {
+                      const { dateStr, isToday } = getDayStatus(date);
+                      const dayName = date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+                      const dayNum = date.getDate();
+                      return (
+                        <th key={dateStr} className={`
+                          p-2 text-center border-b-2 border-[#11d13b]
+                          ${isToday ? 'border-t-2 bg-[#11d13b] bg-opacity-20' : ''}
+                        `}>
+                          <div className="text-xl font-bold">{dayName} {dayNum}</div>
+                        </th>
                       );
                     })}
                   </tr>
-                ))}
-                {quests.length === 0 && (
-                  <tr>
-                    <td colSpan={8} className="text-center p-8 opacity-50">NO ROUTINES INITIALIZED. CHECK ADMIN CONSOLE.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {quests.map(quest => (
+                    <tr key={quest.id} className="border-b border-[#11d13b] border-opacity-30 hover:bg-[#11d13b] hover:bg-opacity-5 transition-colors">
+                      <td className="p-4 font-bold">
+                        <div className="text-lg">{quest.name}</div>
+                        <div className="text-xs opacity-60 flex gap-2">
+                          <span>{quest.duration} MIN</span>
+                          <span>:: {quest.category}</span>
+                        </div>
+                      </td>
+                      {weekDates.map(date => {
+                        const { dateStr, isToday } = getDayStatus(date);
+                        const isCompleted = !!quest.history[dateStr];
+                        return (
+                          <td key={dateStr} className="p-2 text-center">
+                            <div className="flex justify-center">
+                              <input 
+                                type="checkbox"
+                                checked={isCompleted}
+                                disabled={!isToday}
+                                onChange={() => {
+                                  audioService.playClick();
+                                  if (!isCompleted) audioService.playSuccess();
+                                  toggleHistory(quest.id, dateStr);
+                                }}
+                                className={`
+                                  appearance-none border-2 border-[#11d13b] w-8 h-8
+                                  ${isCompleted ? 'bg-[#11d13b] shadow-[0_0_10px_#11d13b]' : 'bg-transparent'}
+                                  ${!isToday ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:scale-110 transition-transform'}
+                                `}
+                              />
+                            </div>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                  {quests.length === 0 && (
+                    <tr>
+                      <td colSpan={8} className="text-center p-8 opacity-50 text-xl">NO ROUTINES INITIALIZED. CHECK ADMIN CONSOLE.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         );
       };
@@ -440,25 +525,25 @@
         }, [quests]);
 
         return (
-          <div className="p-4 space-y-8 bg-black">
+          <div className="p-4 md:p-6 space-y-6 md:space-y-8 bg-black pb-20">
             <div className="grid grid-cols-2 gap-4">
-              <div className="border-2 border-[#11d13b] p-4 text-center bg-black">
-                <div className="text-sm opacity-70 mb-1">CURRENT LEVEL</div>
-                <div className="text-5xl font-bold text-glow">{level}</div>
+              <div className="border-2 border-[#11d13b] p-4 text-center bg-black shadow-[0_0_10px_rgba(17,209,59,0.2)]">
+                <div className="text-xs md:text-sm opacity-70 mb-1">CURRENT LEVEL</div>
+                <div className="text-4xl md:text-6xl font-bold text-glow">{level}</div>
               </div>
-              <div className="border-2 border-[#11d13b] p-4 text-center bg-black">
-                <div className="text-sm opacity-70 mb-1">TOTAL XP</div>
-                <div className="text-5xl font-bold text-glow">{totalXP}</div>
+              <div className="border-2 border-[#11d13b] p-4 text-center bg-black shadow-[0_0_10px_rgba(17,209,59,0.2)]">
+                <div className="text-xs md:text-sm opacity-70 mb-1">TOTAL XP</div>
+                <div className="text-4xl md:text-6xl font-bold text-glow">{totalXP}</div>
               </div>
             </div>
 
-            <div className="border border-[#11d13b] p-4 bg-black relative min-h-[400px]">
+            <div className="border border-[#11d13b] p-2 md:p-4 bg-black relative min-h-[350px] md:min-h-[400px] shadow-[inset_0_0_20px_rgba(17,209,59,0.1)]">
               <h3 className="absolute top-2 left-2 text-sm border-b border-[#11d13b]">S.P.E.C.I.A.L. STATUS</h3>
-              <div className="h-[350px] w-full mt-6">
+              <div className="h-[300px] md:h-[350px] w-full mt-8 md:mt-6">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
+                  <RadarChart cx="50%" cy="50%" outerRadius="75%" data={chartData}>
                     <PolarGrid stroke="#11d13b" strokeOpacity={0.3} />
-                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#11d13b', fontSize: 12, fontFamily: 'VT323' }} />
+                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#11d13b', fontSize: 10, fontFamily: 'VT323' }} />
                     <PolarRadiusAxis angle={30} domain={[0, 'auto']} tick={false} axisLine={false} />
                     <Radar name="Stats" dataKey="A" stroke="#11d13b" strokeWidth={3} fill="#11d13b" fillOpacity={0.4} />
                   </RadarChart>
@@ -472,13 +557,10 @@
                   audioService.playClick();
                   window.resetStatus();
                 }}
-                className="w-full py-4 border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-black transition-colors font-bold text-xl tracking-widest uppercase"
+                className="w-full py-4 border-2 border-red-900 text-red-700 hover:bg-red-900 hover:text-black transition-colors font-bold text-lg md:text-xl tracking-widest uppercase opacity-80 hover:opacity-100"
               >
                 [ RESET OVERSEER STATUS ]
               </button>
-              <p className="text-red-600 text-xs text-center mt-2 opacity-70">
-                * WARNING: THIS ACTION WILL PERMANENTLY ERASE ALL PROGRESS.
-              </p>
             </div>
           </div>
         );
@@ -530,21 +612,21 @@
 
         return (
           <div className="p-4 flex flex-col items-center justify-center h-[60vh] space-y-8">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl text-glow">DATA MANAGEMENT</h2>
-              <p className="opacity-60 text-sm max-w-md mx-auto">
-                ENSURE REGULAR BACKUPS TO PREVENT DATA LOSS DUE TO RADIATION OR RAIDER ATTACKS.
+            <div className="text-center space-y-4">
+              <h2 className="text-3xl text-glow border-b-2 border-[#11d13b] inline-block pb-1">DATA MANAGEMENT</h2>
+              <p className="opacity-70 text-sm max-w-xs mx-auto leading-relaxed">
+                ENSURE REGULAR BACKUPS TO PREVENT DATA LOSS DUE TO RADIATION OR SYSTEM FAILURE.
               </p>
             </div>
 
-            <div className="w-full max-w-md space-y-4">
+            <div className="w-full max-w-sm space-y-4">
               <button
                 onClick={handleExport}
                 onMouseEnter={() => audioService.playHover()}
-                className="w-full border-2 border-[#11d13b] py-4 hover:bg-[#11d13b] hover:text-black transition-all flex justify-center items-center gap-2 group"
+                className="w-full border-2 border-[#11d13b] py-5 text-xl hover:bg-[#11d13b] hover:text-black transition-all flex justify-center items-center gap-3 group shadow-[0_0_10px_rgba(17,209,59,0.1)]"
               >
                 <span className="animate-pulse group-hover:animate-none">▼</span> 
-                [ EXPORT HOLOTAPE ]
+                EXPORT HOLOTAPE
               </button>
 
               <div className="relative">
@@ -558,10 +640,10 @@
                 <button
                   onClick={handleImportClick}
                   onMouseEnter={() => audioService.playHover()}
-                  className="w-full border-2 border-[#11d13b] py-4 hover:bg-[#11d13b] hover:text-black transition-all flex justify-center items-center gap-2 group"
+                  className="w-full border-2 border-[#11d13b] py-5 text-xl hover:bg-[#11d13b] hover:text-black transition-all flex justify-center items-center gap-3 group shadow-[0_0_10px_rgba(17,209,59,0.1)]"
                 >
                    <span className="animate-pulse group-hover:animate-none">▲</span>
-                   [ LOAD HOLOTAPE ]
+                   LOAD HOLOTAPE
                 </button>
               </div>
             </div>
@@ -635,32 +717,35 @@
           localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
         };
 
-        if (!loaded) return <div className="text-[#11d13b] p-10">INITIALIZING PIP-BOY OS...</div>;
+        if (!loaded) return <div className="text-[#11d13b] p-10 animate-pulse text-2xl text-center mt-20">INITIALIZING PIP-BOY OS...</div>;
 
         return (
-          <div className="max-w-4xl mx-auto min-h-screen bg-black text-[#11d13b] font-mono pb-[200px] relative z-10">
-            <div className="p-4 border-b-4 border-[#11d13b] mb-4 flex justify-between items-end">
+          <div className="max-w-4xl mx-auto min-h-screen bg-black text-[#11d13b] font-mono pb-[200px] relative z-10 selection:bg-[#11d13b] selection:text-black">
+            
+            {/* Header */}
+            <div className="p-4 border-b-4 border-[#11d13b] mb-2 flex justify-between items-end bg-black sticky top-0 z-40">
               <div>
-                <h1 className="text-4xl md:text-5xl font-bold text-glow tracking-tighter">PIP-BOY LIFE</h1>
-                <div className="text-sm opacity-70">ROBCO INDUSTRIES (TM) TERM-LINK PROTOCOL</div>
+                <h1 className="text-3xl md:text-5xl font-bold text-glow tracking-tighter leading-none">PIP-BOY LIFE</h1>
+                <div className="text-[10px] md:text-sm opacity-70 tracking-widest mt-1">ROBCO INDUSTRIES (TM) TERM-LINK</div>
               </div>
               <div className="text-right">
-                <div className="text-xs">LVL</div>
-                <div className="text-3xl font-bold">{state.level}</div>
+                <div className="text-[10px] md:text-xs opacity-80">OVERSEER LVL</div>
+                <div className="text-2xl md:text-4xl font-bold leading-none">{state.level}</div>
               </div>
             </div>
 
             <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
-            <main className="mt-6 border-x-2 border-[#11d13b] min-h-[500px] shadow-[0_0_20px_rgba(17,209,59,0.1)] mx-2 md:mx-0 bg-black">
+            <main className="mt-4 md:mt-6 border-x-0 md:border-x-2 border-[#11d13b] min-h-[500px] shadow-[0_0_20px_rgba(17,209,59,0.1)] mx-0 md:mx-2 bg-black">
               {activeTab === 'ADMIN' && <AdminTab quests={state.quests} addQuest={addQuest} deleteQuest={deleteQuest} />}
               {activeTab === 'TRACKER' && <TrackerTab quests={state.quests} toggleHistory={toggleHistory} />}
               {activeTab === 'STATUS' && <StatsTab quests={state.quests} totalXP={state.totalXP} level={state.level} />}
               {activeTab === 'SYSTEM' && <SystemTab state={state} loadState={loadExternalState} />}
             </main>
 
-            <footer className="mt-8 text-center opacity-50 text-xs">
+            <footer className="mt-8 mb-8 text-center opacity-50 text-[10px] md:text-xs">
               <p>VAULT-TEC REMINDS YOU: DISCIPLINE IS KEY TO SURVIVAL.</p>
+              <p className="mt-1">v 1.0.2 // UNIFIED_BUILD</p>
             </footer>
           </div>
         );
